@@ -1,5 +1,5 @@
 {
-    "author": "kathleenxw@gmail.com",
+    "author": "KayThay",
     "dependencies": {},
     "keywords": [],
     "name": "pie_time",
@@ -12,10 +12,15 @@
             "media": []
         },
         "sdkVersion": "3",
+        "targetPlatforms": [
+            "aplite",
+            "basalt",
+            "chalk"
+        ],
         "uuid": "6a26ab20-2aaf-44d7-a736-687e5f4a6102",
         "watchapp": {
             "watchface": false
         }
     },
-    "version": "1.0.0"
+    "version": "0.1.0"
 }
