@@ -58,13 +58,15 @@ static void deinit(){
 /* functions related to to the main window */
 
 static void main_w_load(Window *window){
-    //get window bounds
+    //get main window
     Layer *w_layer = window_get_root_layer(window);
+    //get main window bounds
     GRect bounds = layer_get_bounds(w_layer);
     
     //format time layer
     time_layer = text_layer_create(GRect(0, PBL_IF_ROUND_ELSE(58,52), bounds.size.w, 50));
-    text_layer_set_text(time_layer, "time");
+    text_layer_set_text(time_layer, "0:00");
+    text_layer_set_text_alignment(time_layer, GTextAlignmentCenter);
     
     //format canvas layer
     canvas_layer = layer_create(bounds);
@@ -76,7 +78,9 @@ static void main_w_load(Window *window){
 }
 
 static void main_w_unload(Window *window){
+    //destroy layers
     text_layer_destroy(time_layer);
+    layer_destroy(canvas_layer);
 }
 
 /* ---------------------------------------------------------------------------------- */
@@ -95,19 +99,36 @@ static void update_time(){
     static char s_buffer[8];
     strftime(s_buffer, sizeof(s_buffer), clock_is_24h_style() ? "%H:%M" : "%I:%M", tick_time);    
     text_layer_set_text(time_layer, s_buffer);
+    
+    //update graphics layer
+    layer_mark_dirty(canvas_layer);
 }
 
 /* ---------------------------------------------------------------------------------- */
 /* functions related to to the canvas layer */
 
 static void canvas_update_proc(Layer * layer, GContext * cntxt){
+    //get information about the dimensions of the watch face
+    GRect canvas_bounds = layer_get_bounds(layer);
+    uint16_t middle_x = canvas_bounds.size.w / 2, //the x-coordinate for the middle of the watch
+             middle_y = canvas_bounds.size.w / 2, //the y-coordinate
+             radius = middle_x - 10;
+    
+    //format graphics
     graphics_context_set_stroke_color(cntxt, GColorDarkCandyAppleRed);
     graphics_context_set_fill_color(cntxt, GColorCeleste);
-    graphics_context_set_stroke_width(cntxt, 8);
+    graphics_context_set_stroke_width(cntxt, 4);
     graphics_context_set_antialiased(cntxt, true);
     
-    //draw a line
-    GPoint start = GPoint(10,10);
-    GPoint end = GPoint(10,30);
-    graphics_draw_line(cntxt, start, end);
+    //draw a circle
+    GPoint center = GPoint(middle_x, middle_y);
+    graphics_fill_circle(cntxt, center, radius);
+    
+    //draw the hour hand
+    GPoint hour_start = GPoint(middle_x,middle_y), hour_end = GPoint(middle_x, middle_x + (radius / 2));
+    graphics_draw_line(cntxt, hour_start, hour_end);
+    
+    //draw the minute hand
+    GPoint min_start = GPoint(middle_x,middle_y), min_end = GPoint(middle_x,middle_x + radius);
+    graphics_draw_line(cntxt, min_start, min_end);   
 }
