@@ -11,8 +11,32 @@
         "resources": {
             "media": [
                 {
-                    "file": "images/clay_pot",
-                    "name": "CLAY_POT",
+                    "file": "images/pot",
+                    "name": "POT_CLAY",
+                    "targetPlatforms": null,
+                    "type": "bitmap"
+                },
+                {
+                    "file": "images/tulip4",
+                    "name": "TULIP_4",
+                    "targetPlatforms": null,
+                    "type": "bitmap"
+                },
+                {
+                    "file": "images/tulip3",
+                    "name": "TULIP_3",
+                    "targetPlatforms": null,
+                    "type": "bitmap"
+                },
+                {
+                    "file": "images/tulip2",
+                    "name": "TULIP_2",
+                    "targetPlatforms": null,
+                    "type": "bitmap"
+                },
+                {
+                    "file": "images/tulip1",
+                    "name": "TULIP_1",
                     "targetPlatforms": null,
                     "type": "bitmap"
                 }
