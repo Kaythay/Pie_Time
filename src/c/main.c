@@ -6,7 +6,7 @@
 static Window *main_w;
 static Layer *canvas_layer;
 static TextLayer *time_layer;
-static GBitmap *pot, *flower;
+static GBitmap *pot, *flower1, *flower2, *flower3, *flower4;
 static BitmapLayer *pot_layer, *flower_layer;
 
 /* ------------------------------------------------------------- */
@@ -19,7 +19,7 @@ static void minute_change_handler(struct tm *tick_time, TimeUnits units_changed)
 //functions for updating display
 static void update_time();
 static void update_flower();
-static uint32_t get_flower_resource(int time);
+// static uint32_t get_flower_resource(int time);
 static void update_canvas(Layer * layer, GContext *ctx);
 
 //functions for properly initializing the main window
@@ -83,6 +83,12 @@ static void main_w_load(Window *window){
     //format the flower layer
     bitmap_layer_set_compositing_mode(flower_layer, GCompOpSet);
     
+    //initialize the gbitmaps
+    flower1 = gbitmap_create_with_resource(RESOURCE_ID_TULIP_1);
+    flower2 = gbitmap_create_with_resource(RESOURCE_ID_TULIP_2);
+    flower3 = gbitmap_create_with_resource(RESOURCE_ID_TULIP_3);
+    flower4 = gbitmap_create_with_resource(RESOURCE_ID_TULIP_4);
+    
     //draw the pot
     pot = gbitmap_create_with_resource(RESOURCE_ID_POT_CLAY);
     bitmap_layer_set_compositing_mode(pot_layer, GCompOpSet);
@@ -103,7 +109,10 @@ static void main_w_unload(Window *window){
     text_layer_destroy(time_layer);
     gbitmap_destroy(pot);
     bitmap_layer_destroy(pot_layer);
-    gbitmap_destroy(flower);
+    gbitmap_destroy(flower1);
+    gbitmap_destroy(flower2);
+    gbitmap_destroy(flower3);
+    gbitmap_destroy(flower4);
     bitmap_layer_destroy(flower_layer);
     layer_destroy(canvas_layer);
 }
@@ -144,32 +153,14 @@ static void update_flower(){
     //TODO: optimize?
     int hour = tick_time->tm_sec;
     if (hour == 0){
-        flower = gbitmap_create_with_resource(RESOURCE_ID_TULIP_1);
-        bitmap_layer_set_bitmap(flower_layer, flower);
+        bitmap_layer_set_bitmap(flower_layer, flower1);
     } else if (hour == 15){
-        flower = gbitmap_create_with_resource(RESOURCE_ID_TULIP_2);
-        bitmap_layer_set_bitmap(flower_layer, flower);
+        bitmap_layer_set_bitmap(flower_layer, flower2);
     } else if (hour == 30){
-        flower = gbitmap_create_with_resource(RESOURCE_ID_TULIP_3);
-        bitmap_layer_set_bitmap(flower_layer, flower);
+        bitmap_layer_set_bitmap(flower_layer, flower3);
     } else if (hour == 45){
-        flower = gbitmap_create_with_resource(RESOURCE_ID_TULIP_4);
-        bitmap_layer_set_bitmap(flower_layer, flower);
+        bitmap_layer_set_bitmap(flower_layer, flower4);
     }
-}
-
-static uint32_t get_flower_resource(int time){
-    uint32_t resource_id;
-    if (time == 0){
-        resource_id = RESOURCE_ID_TULIP_1;
-    } else if (time == 15){
-        resource_id = RESOURCE_ID_TULIP_2;
-    } else if (time == 30){
-        resource_id = RESOURCE_ID_TULIP_1;
-    } else if (time == 45){
-        resource_id = RESOURCE_ID_TULIP_4;
-    }
-    return resource_id;
 }
 
 static void update_canvas(Layer * layer, GContext *ctx){
