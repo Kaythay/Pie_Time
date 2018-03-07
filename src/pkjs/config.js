@@ -9,16 +9,16 @@ module.exports = [
       {
         "type": "select",
         "messageKey": "TimePrecision",
-        "label": "Set Time Precision To:",
+        "label": "Time Precision:",
         "defaultValue": 0,
         "options": [
           { 
             "label": "Seconds",
-            "value": 0 
+            "value": 0
           },
           { 
             "label": "Minutes",
-            "value": 1 
+            "value": 1
           },
           { 
             "label": "Hours",
@@ -34,35 +34,28 @@ module.exports = [
       {
         "type": "select",
         "messageKey": "FlowerChangePeriod",
-        "label": "Set Flower to Change Once Every:",
-        "defaultValue": 15,
+        "label": "Flower Change Period:",
+        "defaultValue": 10,
         "options": [
           { 
-            "label": "10 Minutes",
-            "value": 10 
+            "label": "10 seconds",
+            "value": 10
           },
           { 
-            "label": "15 Minutes",
+            "label": "15 seconds",
             "value": 15
           },
           { 
-            "label": "30 Minutes",
+            "label": "30 seconds",
             "value": 30
-          },
-          { 
-            "label": "1 Hour",
-            "value": 0
           }
         ]
       },
-      {
-        "type": "test",
-        "defaultValue": "eg. If 30 minutes is chosen, the flower will change at 0:00, 0:30, 1:00, etc"
-      }
     ]
   },
   {
     "type": "submit",
+    "primary": true,
     "defaultValue": "Save Settings"
   }
 ];
