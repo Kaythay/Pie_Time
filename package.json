@@ -1,21 +1,23 @@
 {
     "author": "KayThay",
-    "dependencies": {},
+    "dependencies": {
+        "pebble-clay": "^1.0.4"
+    },
     "keywords": [],
     "name": "pie_time",
     "pebble": {
+        "capabilities": [
+            "configurable"
+        ],
         "displayName": "Pie_Time",
         "enableMultiJS": true,
-        "messageKeys": [],
+        "messageKeys": [
+            "TimePrecision",
+            "FlowerChangePeriod"
+        ],
         "projectType": "native",
         "resources": {
             "media": [
-                {
-                    "file": "images/pot",
-                    "name": "POT_CLAY",
-                    "targetPlatforms": null,
-                    "type": "bitmap"
-                },
                 {
                     "file": "images/tulip4",
                     "name": "TULIP_4",
@@ -37,6 +39,12 @@
                 {
                     "file": "images/tulip1",
                     "name": "TULIP_1",
+                    "targetPlatforms": null,
+                    "type": "bitmap"
+                },
+                {
+                    "file": "images/pot",
+                    "name": "POT_CLAY",
                     "targetPlatforms": null,
                     "type": "bitmap"
                 }
