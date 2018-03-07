@@ -8,10 +8,12 @@
 static Window* main_w;
 static Layer* canvas_layer;
 static TextLayer* time_layer;
-static GBitmap *pot, *flower1, *flower2, *flower3, *flower4;
+static GBitmap *pot, *current_flower, *next_flower;
 static BitmapLayer *pot_layer, *flower_layer;
-static TimeUnits precision; //used to determine the precision of the time displayed on the watch
-static int change_period;   //used to determine when to change the flower displayed on the watch
+static TimeUnits precision;      //used to determine the precision of the time displayed on the watch
+static int change_period;        //used to determine when to change the flower displayed on the watch
+static int next_flower_index;    //index of current flower resource being displayed (ie. 0, 1, 2, or 3)
+static uint32_t* flower_resource;
 
 /* ------------------------------------------------------------- */
 /* function declarations */
@@ -61,10 +63,16 @@ static void init(){
     
     window_stack_push(main_w, true);
     
-    //set default config value(s)
+    //set default value(s)
     precision = SECOND_UNIT;
     change_period = 15;
-  
+    next_flower_index = 1;
+    flower_resource = malloc(4*sizeof(*flower_resource));
+    flower_resource[0] = RESOURCE_ID_TULIP_1;
+    flower_resource[1] = RESOURCE_ID_TULIP_2;
+    flower_resource[2] = RESOURCE_ID_TULIP_3;
+    flower_resource[3] = RESOURCE_ID_TULIP_4;
+
     //before attaching handlers, initialize the time and the flower 
     //currently, both are initialized in update_time()
     update_time(get_time());
@@ -105,10 +113,8 @@ static void main_w_load(Window *window){
     bitmap_layer_set_compositing_mode(flower_layer, GCompOpSet);
     
     //initialize the gbitmaps
-    flower1 = gbitmap_create_with_resource(RESOURCE_ID_TULIP_1);
-    flower2 = gbitmap_create_with_resource(RESOURCE_ID_TULIP_2);
-    flower3 = gbitmap_create_with_resource(RESOURCE_ID_TULIP_3);
-    flower4 = gbitmap_create_with_resource(RESOURCE_ID_TULIP_4);
+    current_flower = gbitmap_create_with_resource(RESOURCE_ID_TULIP_1);
+    next_flower = gbitmap_create_with_resource(RESOURCE_ID_TULIP_2);
     
     //draw the pot
     pot = gbitmap_create_with_resource(RESOURCE_ID_POT_CLAY);
@@ -130,10 +136,8 @@ static void main_w_unload(Window *window){
     text_layer_destroy(time_layer);
     gbitmap_destroy(pot);
     bitmap_layer_destroy(pot_layer);
-    gbitmap_destroy(flower1);
-    gbitmap_destroy(flower2);
-    gbitmap_destroy(flower3);
-    gbitmap_destroy(flower4);
+    gbitmap_destroy(current_flower);
+    gbitmap_destroy(next_flower);
     bitmap_layer_destroy(flower_layer);
     layer_destroy(canvas_layer);
 }
@@ -217,17 +221,12 @@ static void update_time(struct tm *tick_time){
 }
 
 static void update_flower(struct tm *tick_time){
-    //determine which flower to display
-    //TODO: optimize?
-    int hour = tick_time->tm_sec;
-    if (hour == 0){
-        bitmap_layer_set_bitmap(flower_layer, flower1);
-    } else if (hour == 15){
-        bitmap_layer_set_bitmap(flower_layer, flower2);
-    } else if (hour == 30){
-        bitmap_layer_set_bitmap(flower_layer, flower3);
-    } else if (hour == 45){
-        bitmap_layer_set_bitmap(flower_layer, flower4);
+    if ( (tick_time->tm_sec % change_period) == 0){
+      gbitmap_destroy(current_flower);
+      current_flower = next_flower;
+      next_flower_index = (next_flower_index + 1) % 4;
+      next_flower = gbitmap_create_with_resource(flower_resource[next_flower_index]);
+      bitmap_layer_set_bitmap(flower_layer, current_flower);
     }
 }
 
