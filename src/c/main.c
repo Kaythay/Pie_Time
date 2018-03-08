@@ -7,9 +7,9 @@
 /* variable declarations */
 
 static Window* main_w;
-static Layer* canvas_layer;
+static Layer *canvas_layer, *text_back_layer;
 static TextLayer* time_layer;
-static GBitmap *pot, **flower_resource;
+static GBitmap *pot, *pot2, **flower_resource;
 static BitmapLayer *pot_layer, *flower_layer;
 static TimeUnits precision;    //used to determine the precision of the time displayed on the watch
 static int change_period;      //used to determine when to change the flower displayed on the watch
@@ -34,6 +34,7 @@ static char* time_format();               //returns the appropriate time format 
 static void update_time(time_t curr_time);
 static void update_flower(time_t curr_time);
 static void update_canvas(Layer * layer, GContext *ctx);
+static void update_text_back(Layer * layer, GContext *ctx);
 
 //functions for properly initializing the main window
 static void main_w_load(Window *window);
@@ -66,12 +67,6 @@ static void init(){
     change_period = 15;
     last_repaint = -1;
     curr_flower_index = 0;
-    //initialize the bitmaps
-    flower_resource = malloc(4*sizeof(*flower_resource));
-    flower_resource[0] = gbitmap_create_with_resource(RESOURCE_ID_TULIP_1);
-    flower_resource[1] = gbitmap_create_with_resource(RESOURCE_ID_TULIP_2);
-    flower_resource[2] = gbitmap_create_with_resource(RESOURCE_ID_TULIP_3);
-    flower_resource[3] = gbitmap_create_with_resource(RESOURCE_ID_TULIP_4);
     
     //before attaching handlers, initialize the time and the flower 
     //currently, both are initialized in update_time()
@@ -103,31 +98,48 @@ static void main_w_load(Window *window){
     
     //create layers
     canvas_layer = layer_create(bounds);
+    text_back_layer = layer_create(bounds);
     time_layer = text_layer_create(GRect(0, PBL_IF_ROUND_ELSE(58,52), bounds.size.w, 50));
-    flower_layer = bitmap_layer_create(GRect(35, 20, 70, 85));
-    pot_layer = bitmap_layer_create(GRect(47,105, 50, 48));
-    
+    flower_layer = bitmap_layer_create(GRect(35, 15, 70, 85));
+    pot_layer = bitmap_layer_create(GRect(47,100, 50, 48));
+
+    //initialize the bitmaps
+    flower_resource = malloc(4*sizeof(*flower_resource));
+    flower_resource[0] = gbitmap_create_with_resource(RESOURCE_ID_TULIP_1);
+    flower_resource[1] = gbitmap_create_with_resource(RESOURCE_ID_TULIP_2);
+    flower_resource[2] = gbitmap_create_with_resource(RESOURCE_ID_TULIP_3);
+    flower_resource[3] = gbitmap_create_with_resource(RESOURCE_ID_TULIP_4);
+    pot = gbitmap_create_with_resource(RESOURCE_ID_POT_CLAY);
+    pot2 = gbitmap_create_with_resource(RESOURCE_ID_POT_CLAY);
+
     //format time layer
     text_layer_set_text_alignment(time_layer, GTextAlignmentCenter);
-    text_layer_set_font(time_layer, fonts_get_system_font(FONT_KEY_ROBOTO_CONDENSED_21));
-    text_layer_set_text_color(time_layer, GColorFromRGB(255, 170, 0));
+    text_layer_set_font(time_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18));
+    text_layer_set_text_color(time_layer, GColorFromRGB(255, 255, 255));
     text_layer_set_background_color(time_layer, GColorFromRGBA(0, 0, 0, 0));    //set background to transparent
     
     //format the flower layer
     bitmap_layer_set_compositing_mode(flower_layer, GCompOpSet);
     
-    //draw the pot
-    pot = gbitmap_create_with_resource(RESOURCE_ID_POT_CLAY);
+    //format the pot layer
+    bitmap_layer_set_compositing_mode(pot_layer, GCompOpSet);
+    bitmap_layer_set_bitmap(pot_layer, pot);
+    
+    //format the text back layer
     bitmap_layer_set_compositing_mode(pot_layer, GCompOpSet);
     bitmap_layer_set_bitmap(pot_layer, pot);
     
     //setup canvas procedure
     layer_set_update_proc(canvas_layer, update_canvas);
     
+    //setup text back procedure
+    layer_set_update_proc(text_back_layer, update_text_back);
+    
     //add layers
+    layer_add_child(w_layer, canvas_layer);
     layer_add_child(w_layer, bitmap_layer_get_layer(flower_layer));
     layer_add_child(w_layer, bitmap_layer_get_layer(pot_layer));
-    layer_add_child(w_layer, canvas_layer);
+    layer_add_child(w_layer, text_back_layer);
     layer_add_child(w_layer, text_layer_get_layer(time_layer));
 }
 
@@ -237,8 +249,10 @@ static void update_flower(time_t curr_time){
 }
 
 static void update_canvas(Layer * layer, GContext *ctx){
-    time_t temp = time(NULL);
-//     struct tm *tick_time = localtime(&temp);
-    update_time(temp);
-    update_flower(temp);
+}
+
+static void update_text_back(Layer * layer, GContext *ctx){
+    graphics_context_set_compositing_mode(ctx, GCompOpSet);
+    graphics_context_set_fill_color(ctx, GColorFromRGB(85, 0, 0));
+    graphics_fill_rect(ctx, GRect(45,56,54,17), 0, GCornersAll);
 }
